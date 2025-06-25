@@ -3,5 +3,24 @@
 <mapper namespace="com.jzo2o.foundations.mapper.ServeMapper">
 
 
-
+    <select id="queryServeListByRegionId" resultType="com.jzo2o.foundations.model.dto.response.ServeResDTO"
+            parameterType="java.lang.Long">
+        select
+            si.serve_type_id,
+            si.name,
+            si.update_time,
+            s.sale_status,
+            s.serve_item_id,
+            si.reference_price,
+            si.create_time,
+            s.region_id,
+            s.price,
+            s.id,
+            s.is_hot,
+            st.name serve_type_name
+        FROM serve s
+                 INNER JOIN serve_item si on  si.id = s.serve_item_id
+                 INNER JOIN serve_type st on st.id = si.serve_type_id
+        WHERE s.region_id = #{regionId}
+    </select>
 </mapper>

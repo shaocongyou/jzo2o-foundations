@@ -164,14 +164,22 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
         if (!(FoundationStatusEnum.INIT.getStatus() == activeStatus || FoundationStatusEnum.DISABLE.getStatus() == activeStatus)) {
             throw new ForbiddenOperationException("草稿或禁用状态方可启用");
         }
-        //如果需要启用区域，需要校验该区域下是否有上架的服务
-        //todo
 
-        //更新启用状态
-        LambdaUpdateWrapper<Region> updateWrapper = Wrappers.<Region>lambdaUpdate()
+        Integer count = serveService.lambdaQuery()
+                .eq(Serve::getRegionId, id)
+                .eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus())
+                .count();
+        if(count <= 0){
+            throw new ForbiddenOperationException("区域下无上架的服务，启用失败");
+        }
+
+        boolean success = lambdaUpdate()
                 .eq(Region::getId, id)
-                .set(Region::getActiveStatus, FoundationStatusEnum.ENABLE.getStatus());
-        update(updateWrapper);
+                .set(Region::getActiveStatus, FoundationStatusEnum.ENABLE.getStatus())
+                .update();
+        if(!success){
+            throw new CommonException("启用失败");
+        }
 
         //3.如果是启用操作，刷新缓存：启用区域列表、首页图标、热门服务、服务类型
         // todo

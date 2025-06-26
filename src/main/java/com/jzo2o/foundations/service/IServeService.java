@@ -27,4 +27,6 @@ public interface IServeService extends IService<Serve> {
     Serve updatePrice(Long id, BigDecimal price);
 
     Serve onSale(Long id);
+
+    void deleteServe(Long id);
 }

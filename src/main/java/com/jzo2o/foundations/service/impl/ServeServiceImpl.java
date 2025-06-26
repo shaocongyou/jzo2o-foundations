@@ -123,4 +123,21 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
         return  baseMapper.selectById(id);
     }
 
+    @Override
+    public void deleteServe(Long id) {
+        Serve serve = baseMapper.selectById(id);
+        if(ObjectUtils.isNull(serve)){
+            throw new CommonException("服务不存在");
+        }
+        if(serve.getSaleStatus() != FoundationStatusEnum.INIT.getStatus()) {
+            throw new CommonException("仅当服务处于 草稿 状态，可删除，当前状态不满足");
+        }
+        boolean delete = lambdaUpdate()
+                .eq(Serve::getId, id)
+                .remove();
+        if(!delete){
+            throw new CommonException("删除服务失败");
+        }
+    }
+
 }

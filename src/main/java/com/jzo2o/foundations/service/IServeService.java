@@ -25,4 +25,6 @@ public interface IServeService extends IService<Serve> {
     void batchadd(List<ServeUpsertReqDTO> serveUpsertReqDTOList);
 
     Serve updatePrice(Long id, BigDecimal price);
+
+    Serve onSale(Long id);
 }

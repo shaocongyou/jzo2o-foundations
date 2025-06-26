@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.api.foundations.dto.response.RegionSimpleResDTO;
+import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.expcetions.ForbiddenOperationException;
 import com.jzo2o.common.model.PageResult;
 import com.jzo2o.foundations.constants.RedisConstants;
@@ -16,11 +17,13 @@ import com.jzo2o.foundations.mapper.CityDirectoryMapper;
 import com.jzo2o.foundations.mapper.RegionMapper;
 import com.jzo2o.foundations.model.domain.CityDirectory;
 import com.jzo2o.foundations.model.domain.Region;
+import com.jzo2o.foundations.model.domain.Serve;
 import com.jzo2o.foundations.model.dto.request.RegionPageQueryReqDTO;
 import com.jzo2o.foundations.model.dto.request.RegionUpsertReqDTO;
 import com.jzo2o.foundations.model.dto.response.RegionResDTO;
 import com.jzo2o.foundations.service.IConfigRegionService;
 import com.jzo2o.foundations.service.IRegionService;
+import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.mysql.utils.PageUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -43,6 +46,8 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     private IConfigRegionService configRegionService;
     @Resource
     private CityDirectoryMapper cityDirectoryMapper;
+    @Resource
+    private IServeService serveService;
 
 
     /**
@@ -193,19 +198,32 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
         if (!(FoundationStatusEnum.ENABLE.getStatus() == activeStatus)) {
             throw new ForbiddenOperationException("启用状态方可禁用");
         }
-
         //1.如果禁用区域下有上架的服务则无法禁用
+        Integer count = serveService.lambdaQuery()
+                .eq(Serve::getRegionId, id)
+                .eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus())
+                .count();
+        if(count > 0){
+            throw new ForbiddenOperationException("区域下有上架的服务无法禁用");
+        }
+        boolean success = lambdaUpdate()
+                .eq(Region::getId, id)
+                .set(Region::getActiveStatus, FoundationStatusEnum.DISABLE.getStatus())
+                .update();
+        if(!success){
+            throw new CommonException("禁用失败");
+        }
         //todo
 //        int count = serveService.queryServeCountByRegionIdAndSaleStatus(id, FoundationStatusEnum.ENABLE.getStatus());
 //        if (count > 0) {
 //            throw new ForbiddenOperationException("区域下有上架的服务无法禁用");
 //        }
 
-        //更新禁用状态
-        LambdaUpdateWrapper<Region> updateWrapper = Wrappers.<Region>lambdaUpdate()
-                .eq(Region::getId, id)
-                .set(Region::getActiveStatus, FoundationStatusEnum.DISABLE.getStatus());
-        update(updateWrapper);
+//        //更新禁用状态
+//        LambdaUpdateWrapper<Region> updateWrapper = Wrappers.<Region>lambdaUpdate()
+//                .eq(Region::getId, id)
+//                .set(Region::getActiveStatus, FoundationStatusEnum.DISABLE.getStatus());
+//        update(updateWrapper);
     }
 
     /**

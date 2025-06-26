@@ -140,4 +140,42 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
         }
     }
 
+    @Override
+    public Serve offSale(Long id) {
+        Serve serve = baseMapper.selectById(id);
+        if(ObjectUtils.isNull(serve)){
+            throw new CommonException("服务不存在");
+        }
+        if(serve.getSaleStatus() != FoundationStatusEnum.ENABLE.getStatus()) {
+            throw new CommonException("仅当服务处于 上架 状态，可下架，当前状态不满足");
+        }
+        boolean off = lambdaUpdate()
+                .eq(Serve::getId, id)
+                .set(Serve::getSaleStatus, FoundationStatusEnum.DISABLE.getStatus())
+                .update();
+        if(!off){
+            throw new CommonException("下架服务失败");
+        }
+        return baseMapper.selectById(id);
+    }
+
+    @Override
+    public Serve offHot(Long id) {
+        Serve serve = baseMapper.selectById(id);
+        if(ObjectUtils.isNull(serve)){
+            throw new CommonException("服务不存在");
+        }
+        if(serve.getIsHot() != 1) {
+            throw new CommonException("仅当服务处于 热门 状态，可取消热门，当前状态不满足");
+        }
+        boolean off = lambdaUpdate()
+                .eq(Serve::getId, id)
+                .set(Serve::getIsHot, 0)
+                .update();
+        if(!off){
+            throw new CommonException("取消热门服务失败");
+        }
+        return baseMapper.selectById(id);
+    }
+
 }

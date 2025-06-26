@@ -33,4 +33,6 @@ public interface IServeService extends IService<Serve> {
     Serve offSale(Long id);
 
     Serve offHot(Long id);
+
+    Integer countActiveServesByItemIdWithRegion(Long itemId);
 }

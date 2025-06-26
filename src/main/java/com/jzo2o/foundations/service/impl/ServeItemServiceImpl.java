@@ -10,18 +10,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.api.foundations.dto.response.ServeItemResDTO;
 import com.jzo2o.api.foundations.dto.response.ServeItemSimpleResDTO;
 import com.jzo2o.api.foundations.dto.response.ServeTypeCategoryResDTO;
+import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.expcetions.ForbiddenOperationException;
 import com.jzo2o.common.model.PageResult;
 import com.jzo2o.foundations.constants.RedisConstants;
 import com.jzo2o.foundations.enums.FoundationStatusEnum;
 import com.jzo2o.foundations.mapper.ServeItemMapper;
 import com.jzo2o.foundations.mapper.ServeTypeMapper;
+import com.jzo2o.foundations.model.domain.Serve;
 import com.jzo2o.foundations.model.domain.ServeItem;
 import com.jzo2o.foundations.model.domain.ServeType;
 import com.jzo2o.foundations.model.dto.request.ServeItemPageQueryReqDTO;
 import com.jzo2o.foundations.model.dto.request.ServeItemUpsertReqDTO;
 import com.jzo2o.foundations.model.dto.request.ServeSyncUpdateReqDTO;
 import com.jzo2o.foundations.service.IServeItemService;
+import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.foundations.service.IServeSyncService;
 import com.jzo2o.mysql.utils.PageHelperUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -47,6 +50,10 @@ public class ServeItemServiceImpl extends ServiceImpl<ServeItemMapper, ServeItem
 
     @Resource
     private ServeTypeMapper serveTypeMapper;
+    @Resource
+    private IServeService serveService;
+    @Resource
+    private IServeItemService serveItemService;
 
     /**
      * 服务项新增
@@ -161,12 +168,23 @@ public class ServeItemServiceImpl extends ServiceImpl<ServeItemMapper, ServeItem
             throw new ForbiddenOperationException("启用状态方可禁用");
         }
 
-        //有区域在使用该服务将无法禁用（存在关联的区域服务且状态为上架表示有区域在使用该服务项）
-        //todo
-
-        //更新禁用状态
-        LambdaUpdateWrapper<ServeItem> updateWrapper = Wrappers.<ServeItem>lambdaUpdate().eq(ServeItem::getId, id).set(ServeItem::getActiveStatus, FoundationStatusEnum.DISABLE.getStatus());
-        update(updateWrapper);
+        Integer count = serveService.countActiveServesByItemIdWithRegion(id);
+        if(count > 0) {
+            throw new ForbiddenOperationException("有区域在使用该服务项，无法禁用。");
+        }
+        boolean success = serveItemService.lambdaUpdate()
+                .eq(ServeItem::getId, id)
+                .set(ServeItem::getActiveStatus, FoundationStatusEnum.DISABLE.getStatus())
+                .update();
+        if(!success){
+            throw new CommonException("禁用失败");
+        }
+//        //有区域在使用该服务将无法禁用（存在关联的区域服务且状态为上架表示有区域在使用该服务项）
+//        //todo
+//
+//        //更新禁用状态
+//        LambdaUpdateWrapper<ServeItem> updateWrapper = Wrappers.<ServeItem>lambdaUpdate().eq(ServeItem::getId, id).set(ServeItem::getActiveStatus, FoundationStatusEnum.DISABLE.getStatus());
+//        update(updateWrapper);
     }
 
 

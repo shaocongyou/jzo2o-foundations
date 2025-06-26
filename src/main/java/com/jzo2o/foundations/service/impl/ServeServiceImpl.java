@@ -178,4 +178,13 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
         return baseMapper.selectById(id);
     }
 
+    @Override
+    public Integer countActiveServesByItemIdWithRegion(Long itemId) {
+        return lambdaQuery()
+                .eq(Serve::getServeItemId, itemId)
+                .eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus())
+                .isNotNull(Serve::getRegionId)
+                .count();
+    }
+
 }

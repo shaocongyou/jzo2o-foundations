@@ -1,6 +1,7 @@
 package com.jzo2o.foundations.service;
 
 import com.jzo2o.common.model.PageResult;
+import com.jzo2o.foundations.model.domain.Serve;
 import com.jzo2o.foundations.model.dto.request.ServePageQueryReqDTO;
 import com.jzo2o.foundations.model.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
@@ -82,4 +83,25 @@ class IServeServiceTest {
 //        log.info("page : {}", page);
 //        Assert.notEmpty(page.getList(),"列表为空");
 //    }
+
+    @Test
+    public void test_queryServeByIdCache(){
+        Serve serve = serveService.queryServeByIdCache(1693815623867506689L);
+        Assert.notNull(serve,"服务为空");
+    }
+
+    @Test
+    public void test_onSale(){
+        //从serve表找一条下架的服务（sale_status  '售卖状态，0：草稿，1下架，2上架',）
+        Serve serve = serveService.onSale(1715263395009191938L);
+        Assert.notNull(serve,"服务为空");
+    }
+
+    //服务下架测试
+    @Test
+    public void test_offSale(){
+        //从serve表找一条上架的服务（sale_status  '售卖状态，0：草稿，1下架，2上架',）
+        Serve serve = serveService.offSale(1715263395009191938L);
+        Assert.notNull(serve,"服务为空");
+    }
 }

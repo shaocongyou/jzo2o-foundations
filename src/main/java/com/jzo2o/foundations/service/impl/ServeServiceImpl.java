@@ -6,6 +6,7 @@ import com.jzo2o.common.expcetions.ForbiddenOperationException;
 import com.jzo2o.common.model.PageResult;
 import com.jzo2o.common.utils.BeanUtils;
 import com.jzo2o.common.utils.ObjectUtils;
+import com.jzo2o.foundations.constants.RedisConstants;
 import com.jzo2o.foundations.enums.FoundationStatusEnum;
 import com.jzo2o.foundations.mapper.RegionMapper;
 import com.jzo2o.foundations.mapper.ServeItemMapper;
@@ -19,6 +20,9 @@ import com.jzo2o.foundations.model.dto.response.ServeResDTO;
 import com.jzo2o.foundations.service.IServeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.mysql.utils.PageHelperUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,6 +100,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
      * @return
      */
     @Override
+    @CachePut(value = RedisConstants.CacheName.SERVE, key = "#id",  cacheManager = RedisConstants.CacheManager.ONE_DAY)
     @Transactional
     public Serve onSale(Long id) {
         Serve serve = baseMapper.selectById(id);
@@ -141,6 +146,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
+    @CacheEvict(value = RedisConstants.CacheName.SERVE, key = "#id")
     public Serve offSale(Long id) {
         Serve serve = baseMapper.selectById(id);
         if(ObjectUtils.isNull(serve)){
@@ -185,6 +191,11 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
                 .eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus())
                 .isNotNull(Serve::getRegionId)
                 .count();
+    }
+
+    @Cacheable(value = RedisConstants.CacheName.SERVE,key="#id",cacheManager = RedisConstants.CacheManager.ONE_DAY)
+    public Serve queryServeByIdCache(Long id) {
+        return getById(id);
     }
 
 }

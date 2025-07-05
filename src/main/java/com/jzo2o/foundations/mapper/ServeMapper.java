@@ -21,4 +21,6 @@ import java.util.List;
  */
 public interface ServeMapper extends BaseMapper<Serve> {
     List<ServeResDTO> queryServeListByRegionId(@Param("regionId") Long regionId);
+
+    List<ServeCategoryResDTO> findServeIconCategoryByRegionId(java.lang.Long regionId);
 }

@@ -1,6 +1,7 @@
 package com.jzo2o.foundations.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.jzo2o.foundations.constants.RedisConstants;
 import com.jzo2o.foundations.enums.FoundationStatusEnum;
 import com.jzo2o.foundations.mapper.ServeMapper;
 import com.jzo2o.foundations.model.domain.Region;
@@ -8,6 +9,8 @@ import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeSimpleResDTO;
 import com.jzo2o.foundations.service.HomeService;
 import com.jzo2o.foundations.service.IRegionService;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,6 +33,14 @@ public class HomeServiceImpl implements HomeService {
      * @return 已开通的服务类型
      */
     @Override
+    @Caching(
+            cacheable = {
+                    //result为null时,属于缓存穿透情况，缓存时间30分钟
+                    @Cacheable(value = RedisConstants.CacheName.SERVE_ICON, key = "#regionId", unless = "#result.size() != 0", cacheManager = RedisConstants.CacheManager.THIRTY_MINUTES),
+                    //result不为null时,永久缓存
+                    @Cacheable(value = RedisConstants.CacheName.SERVE_ICON, key = "#regionId", unless = "#result.size() == 0", cacheManager = RedisConstants.CacheManager.FOREVER)
+            }
+    )
     public List<ServeCategoryResDTO> queryServeIconCategoryByRegionIdCache(Long regionId) {
         //1.校验当前城市是否为启用状态
         Region region = regionService.getById(regionId);

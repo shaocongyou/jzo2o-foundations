@@ -22,4 +22,6 @@ public interface ServeMapper extends BaseMapper<Serve> {
     List<ServeCategoryResDTO> findServeIconCategoryByRegionId(java.lang.Long regionId);
 
     List<ServeAggregationTypeSimpleResDTO> serveTypeList(Long regionId);
+
+    List<ServeAggregationSimpleResDTO> hotServeList(Long regionId);
 }

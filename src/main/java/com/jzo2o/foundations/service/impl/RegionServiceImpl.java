@@ -221,17 +221,6 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
         if(!success){
             throw new CommonException("禁用失败");
         }
-        //todo
-//        int count = serveService.queryServeCountByRegionIdAndSaleStatus(id, FoundationStatusEnum.ENABLE.getStatus());
-//        if (count > 0) {
-//            throw new ForbiddenOperationException("区域下有上架的服务无法禁用");
-//        }
-
-//        //更新禁用状态
-//        LambdaUpdateWrapper<Region> updateWrapper = Wrappers.<Region>lambdaUpdate()
-//                .eq(Region::getId, id)
-//                .set(Region::getActiveStatus, FoundationStatusEnum.DISABLE.getStatus());
-//        update(updateWrapper);
     }
 
     /**

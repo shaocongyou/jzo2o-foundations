@@ -1,8 +1,8 @@
 package com.jzo2o.foundations.service;
 
-import com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeTypeResDTO;
+import com.jzo2o.foundations.model.domain.Serve;
+import com.jzo2o.foundations.model.domain.ServeItem;
+import com.jzo2o.foundations.model.dto.response.*;
 
 import java.util.List;
 
@@ -17,4 +17,12 @@ public interface HomeService {
     List<ServeCategoryResDTO> queryServeIconCategoryByRegionIdCache(Long regionId);
 
     List<ServeAggregationTypeSimpleResDTO> serveTypeList(Long regionId);
+
+    List<ServeAggregationSimpleResDTO> hotServeList(Long regionId);
+
+    ServeAggregationSimpleResDTO serveDetail(Long regionId);
+
+    Serve getServeByServeId(Long regionId);
+
+    ServeItem getServeItemByServeItemId(Long serveItemId);
 }

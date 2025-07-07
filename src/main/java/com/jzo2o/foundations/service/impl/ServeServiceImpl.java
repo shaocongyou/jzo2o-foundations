@@ -198,4 +198,23 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
         return getById(id);
     }
 
+    @Override
+    public Serve onHot(Long id) {
+        Serve serve = baseMapper.selectById(id);
+        if(ObjectUtils.isNull(serve)){
+            throw new CommonException("服务不存在");
+        }
+        if(serve.getIsHot() != 0) {
+            throw new CommonException("仅当服务处于 非热门 状态，可设置热门，当前状态不满足");
+        }
+        boolean on = lambdaUpdate()
+                .eq(Serve::getId, id)
+                .set(Serve::getIsHot, 1)
+                .update();
+        if(!on){
+            throw new CommonException("取消热门服务失败");
+        }
+        return baseMapper.selectById(id);
+    }
+
 }

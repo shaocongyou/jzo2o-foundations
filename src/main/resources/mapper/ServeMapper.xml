@@ -72,7 +72,7 @@
 
     <select id="serveTypeList" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO"
             parameterType="java.lang.Long">
-        SELECT
+        SELECT DISTINCT
             si.serve_type_id,
             st.img serve_type_img,
             st.sort_num serve_type_sort_num,
@@ -83,6 +83,25 @@
         WHERE s.region_id = #{regionId}
         And s.sale_status = 2
         ORDER BY serve_type_sort_num
+    </select>
+
+    <select id="hotServeList" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO"
+            parameterType="java.lang.Long">
+        SELECT
+            s.city_code,
+            si.name serve_item_name,
+            s.serve_item_id,
+            si.unit,
+            si.detail_img,
+            s.price,
+            si.serve_item_icon,
+            s.id
+        FROM serve s
+                 INNER  JOIN serve_item si ON s.serve_item_id = si.id
+                 INNER JOIN serve_type st on si.serve_type_id = st.id
+        WHERE s.region_id = #{regionId}
+          And s.sale_status = 2
+          And s.is_hot = 1
     </select>
 
 </mapper>

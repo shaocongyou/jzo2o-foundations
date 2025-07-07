@@ -5,8 +5,10 @@ import com.jzo2o.foundations.constants.RedisConstants;
 import com.jzo2o.foundations.enums.FoundationStatusEnum;
 import com.jzo2o.foundations.mapper.ServeMapper;
 import com.jzo2o.foundations.model.domain.Region;
+import com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeSimpleResDTO;
+import com.jzo2o.foundations.model.dto.response.ServeTypeResDTO;
 import com.jzo2o.foundations.service.HomeService;
 import com.jzo2o.foundations.service.IRegionService;
 import org.springframework.cache.annotation.Cacheable;
@@ -67,5 +69,22 @@ public class HomeServiceImpl implements HomeService {
         });
 
         return serveCategoryResDTOS;
+    }
+
+    @Override
+    public List<ServeAggregationTypeSimpleResDTO> serveTypeList(Long regionId) {
+        //1.校验当前城市是否为启用状态
+        Region region = regionService.getById(regionId);
+        if (ObjectUtil.isEmpty(region) || ObjectUtil.equal(FoundationStatusEnum.DISABLE.getStatus(), region.getActiveStatus())) {
+            return Collections.emptyList();
+        }
+
+        //2.获取当前区域的服务类型
+        List<ServeAggregationTypeSimpleResDTO> serveAggregationTypeSimpleResDTOList = serveMapper.serveTypeList(regionId);
+        System.out.println("99999999999999999999999999999");
+        System.out.println(serveAggregationTypeSimpleResDTOList);
+        System.out.println("99999999999999999999999999999");
+
+        return serveAggregationTypeSimpleResDTOList;
     }
 }

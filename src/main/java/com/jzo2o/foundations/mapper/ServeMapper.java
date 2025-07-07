@@ -3,10 +3,7 @@ package com.jzo2o.foundations.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jzo2o.api.foundations.dto.response.ServeAggregationResDTO;
 import com.jzo2o.foundations.model.domain.Serve;
-import com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeResDTO;
+import com.jzo2o.foundations.model.dto.response.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -23,4 +20,6 @@ public interface ServeMapper extends BaseMapper<Serve> {
     List<ServeResDTO> queryServeListByRegionId(@Param("regionId") Long regionId);
 
     List<ServeCategoryResDTO> findServeIconCategoryByRegionId(java.lang.Long regionId);
+
+    List<ServeAggregationTypeSimpleResDTO> serveTypeList(Long regionId);
 }

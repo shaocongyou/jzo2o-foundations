@@ -69,4 +69,20 @@
             <result column="serve_item_sort_num" property="serveItemSortNum"></result>
         </collection>
     </resultMap>
+
+    <select id="serveTypeList" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO"
+            parameterType="java.lang.Long">
+        SELECT
+            si.serve_type_id,
+            st.img serve_type_img,
+            st.sort_num serve_type_sort_num,
+            st.name serve_type_name
+        FROM serve s
+        INNER  JOIN serve_item si ON s.serve_item_id = si.id
+        INNER JOIN serve_type st on si.serve_type_id = st.id
+        WHERE s.region_id = #{regionId}
+        And s.sale_status = 2
+        ORDER BY serve_type_sort_num
+    </select>
+
 </mapper>

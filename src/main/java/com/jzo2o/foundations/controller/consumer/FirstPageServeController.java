@@ -1,6 +1,8 @@
 package com.jzo2o.foundations.controller.consumer;
 
+import com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
+import com.jzo2o.foundations.model.dto.response.ServeTypeResDTO;
 import com.jzo2o.foundations.service.HomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,5 +32,15 @@ public class FirstPageServeController  {
     public List<ServeCategoryResDTO> serveCategory(@RequestParam("regionId") Long regionId) {
         List<ServeCategoryResDTO> serveCategoryResDTOS = homeService.queryServeIconCategoryByRegionIdCache(regionId);
         return serveCategoryResDTOS;
+    }
+
+    @GetMapping("/serveTypeList")
+    @ApiOperation("服务分类列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "regionId", value = "区域id", required = true, dataTypeClass = Long.class)
+    })
+    public List<ServeAggregationTypeSimpleResDTO> serveTypeList(@RequestParam("regionId") Long regionId) {
+        List<ServeAggregationTypeSimpleResDTO> serveAggregationTypeSimpleResDTOs = homeService.serveTypeList(regionId);
+        return serveAggregationTypeSimpleResDTOs;
     }
 }
